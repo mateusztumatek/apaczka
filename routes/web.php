@@ -12,6 +12,13 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('home');
 });
 Route::get('/orders', 'OrderController@index');
+
+Route::get('/set_shippment', 'ShippmentController@index');
+Route::post('/save_shippments', 'ShippmentController@save');
+
+Route::group(['prefix' => 'admin'], function () {
+    Voyager::routes();
+});

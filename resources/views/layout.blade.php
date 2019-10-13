@@ -8,7 +8,7 @@
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
-
+        <link rel="stylesheet" href="{{ asset('css/app.css') }}" type="text/css">
         <!-- Styles -->
         <style>
             html, body {
@@ -64,7 +64,7 @@
         </style>
     </head>
     <body>
-        <div class="flex-center position-ref full-height">
+        <div class="d-flex justify-content-center position-ref full-height">
             @if (Route::has('login'))
                 <div class="top-right links">
                     @auth
@@ -80,14 +80,9 @@
             @endif
 
             <div class="content">
-                <div class="title m-b-md">
-                    Laravel
-                </div>
-
-                <div class="links">
-                    <a  href="{{url('/orders')}}">Wyślij zamówienie</a>
-                </div>
+                @yield('content')
             </div>
         </div>
     </body>
+    <script src="{{asset('/js/app.js')}}" defer></script>
 </html>
