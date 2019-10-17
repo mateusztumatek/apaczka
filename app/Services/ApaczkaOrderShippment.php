@@ -22,14 +22,18 @@ class ApaczkaOrderShippment {
             }
         }
     }
-
+    function setPaczkomatOptions($sender_paczkomat, $recivier_paczkomat){
+        $this->options = array();
+        $this->options[0] = $sender_paczkomat;
+        $this->options[1] = $recivier_paczkomat;
+    }
     function getShipmentTypeCode() {
         return $this->shipmentTypeCode;
     }
 
     function setShipmentTypeCode($shipmentTypeCode) {
         if (!in_array($shipmentTypeCode, self::$dictShipmentTypeCode)) {
-            throw new Exception('UNSUPPORTED shipment type code: [' . $shipmentTypeCode . '] must be one of: ' . print_r(self::$dictShipmentTypeCode, 1));
+            throw new \Exception('UNSUPPORTED shipment type code: [' . $shipmentTypeCode . '] must be one of: ' . print_r(self::$dictShipmentTypeCode, 1));
         }
 
         $this->shipmentTypeCode = $shipmentTypeCode;
@@ -41,7 +45,7 @@ class ApaczkaOrderShippment {
 
     function addOrderOption($option) {
         if (!in_array($option, self::$dictShipmentOptions)) {
-            throw new Exception('UNSUPPORTED order option: [' . $option . '] must be one of: ' . print_r(self::$dictShipmentOptions, 1));
+            throw new \Exception('UNSUPPORTED order option: [' . $option . '] must be one of: ' . print_r(self::$dictShipmentOptions, 1));
         }
 
         if ($this->options == "") {

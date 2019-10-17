@@ -32,18 +32,27 @@ class ShippmentController extends Controller
         'APACZKA_DE' => 'Apaczka Niemcy',
         'PACZKOMAT' => 'Paczkomaty',
         'GLS' => 'GLS zagranica'
+    ],
+    $pickup_types = [
+        'COURIER' => 'zamówienie odbioru przesyłek',
+        'SELF' => 'dostarczenie samodzielnie do kuriera',
+        'BOX_MACHINE' => 'dostarczenie samodzielnie do paczkomatu'
     ];
     public function index(){
         $shippments = Shippment::with('shippment_maps')->get();
         $apaczka_shippments = $this->apazcka_shippments;
-        return view('shippment', compact('shippments', 'apaczka_shippments'));
+        $pickup_types = $this->pickup_types;
+        return view('shippment', compact('shippments', 'apaczka_shippments', 'pickup_types'));
     }
     public function save(Request $request){
         foreach ($request->shippment as $key => $s){
-            if($s){
+            if($s['code']){
                 ShippmentMap::where('order_type', $key)->delete();
                 ShippmentMap::create([
-                    'apaczka_codename' => $s,
+                    'apaczka_codename' => $s['code'],
+                    'is_domestic' => (array_key_exists('isDomestic', $s) && $s['isDomestic'] == 'on')? true : false,
+                    'is_paczkomat' => (array_key_exists('is_paczkomat', $s) && $s['is_paczkomat'] == 'on')? true : false,
+                    'pickup' => $s['pickup_type'],
                     'order_type' => $key
                 ]);
             }else{

@@ -142,7 +142,7 @@ class ApaczkaApi {
 			file_put_contents($this->outputFileName, "Response: \n" . $this->client->__getLastResponse() . "\n\n", FILE_APPEND);
 		} catch (Exception $ex) {
 			if ($this->isVerboseMode) {
-				print_r($ex);
+				/*print_r($ex);*/
 			}
 
 			file_put_contents($this->outputFileName, "[" . date('c') . "]\n" . "SoapCall: [$operation]\n", FILE_APPEND);

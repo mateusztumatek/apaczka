@@ -16,6 +16,10 @@ Route::get('/', function () {
 });
 Route::get('/orders', 'OrderController@index');
 
+Route::resource('/user', 'UserController');
+Route::get('/errors', 'ErrorsController@index');
+Route::delete('/errors/{id}', 'ErrorsController@destroy');
+
 Route::get('/set_shippment', 'ShippmentController@index');
 Route::post('/save_shippments', 'ShippmentController@save');
 

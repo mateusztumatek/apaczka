@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
-class CreateSettingsTable extends Migration
+class CreateErrorsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,11 @@ class CreateSettingsTable extends Migration
      */
     public function up()
     {
-        Schema::create('settings_2', function (Blueprint $table) {
+        Schema::create('errors', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('key');
-            $table->string('value');
+            $table->integer('order_id');
+            $table->string('code');
+            $table->text('description');
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ class CreateSettingsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('settings');
+        Schema::dropIfExists('errors');
     }
 }

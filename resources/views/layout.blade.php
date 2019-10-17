@@ -41,7 +41,6 @@
             }
 
             .content {
-                text-align: center;
             }
 
             .title {
@@ -64,7 +63,7 @@
         </style>
     </head>
     <body>
-        <div class="d-flex justify-content-center position-ref full-height">
+        <div class="d-flex justify-content-center position-ref">
             @if (Route::has('login'))
                 <div class="top-right links">
                     @auth

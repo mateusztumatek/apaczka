@@ -30,8 +30,8 @@ class ApaczkaOrder {
 
     var $shipments = array();
 
-    private static $dictServiceCode = array('UPS_K_STANDARD', 'UPS_K_EX_SAV', 'UPS_K_EX', 'UPS_K_EXP_PLUS', 'UPS_Z_STANDARD', 'UPS_Z_EX_SAV', 'UPS_Z_EX', 'UPS_Z_EXPEDITED', 'UPS_K_TODAY_STANDARD', 'UPS_K_TODAY_EXPRESS', 'UPS_K_TODAY_EXP_SAV', 'DPD_CLASSIC', 'DPD_CLASSIC_FOREIGN', 'DHLSTD', 'DHL12', 'DHL09', 'DHL1722', 'KEX_EXPRESS', 'FEDEX', 'POCZTA_POLSKA', 'POCZTA_POLSKA_E24', 'TNT', 'TNT_Z', 'TNT_Z2');
-    private static $dictOrderPickupType = array('COURIER', 'SELF');
+    private static $dictServiceCode = array('UPS_K_STANDARD', 'UPS_K_EX_SAV', 'UPS_K_EX', 'UPS_K_EXP_PLUS', 'UPS_Z_STANDARD', 'UPS_Z_EX_SAV', 'UPS_Z_EX', 'UPS_Z_EXPEDITED', 'UPS_K_TODAY_STANDARD', 'UPS_K_TODAY_EXPRESS', 'UPS_K_TODAY_EXP_SAV', 'DPD_CLASSIC', 'DPD_CLASSIC_FOREIGN', 'DHLSTD', 'DHL12', 'DHL09', 'DHL1722', 'KEX_EXPRESS', 'FEDEX', 'POCZTA_POLSKA', 'POCZTA_POLSKA_E24', 'TNT', 'TNT_Z', 'TNT_Z2', 'INPOST', 'APACZKA_DE', 'PACZKOMAT', 'GLS');
+    private static $dictOrderPickupType = array('COURIER', 'SELF', 'BOX_MACHINE');
     private static $dictOrderOptions = array('POBRANIE', 'ZWROT_DOK', 'DOR_OSOBA_PRYW', 'DOST_SOB', 'PODPIS_DOROS');
 
     function ApaczkaOrder() {
@@ -87,7 +87,7 @@ class ApaczkaOrder {
 
     function setServiceCode($serviceCode) {
         if (!in_array($serviceCode, self::$dictServiceCode)) {
-            throw new Exception('UNSUPPORTED service code: [' . $serviceCode . '] must be one of: ' . print_r(self::$dictServiceCode, 1));
+            throw new \Exception('UNSUPPORTED service code: [' . $serviceCode . '] must be one of: ' . print_r(self::$dictServiceCode, 1));
         }
 
         $this->serviceCode = $serviceCode;
