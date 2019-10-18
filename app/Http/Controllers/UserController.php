@@ -2,14 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Setting;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
+    public function home(){
+        $last_id = Setting::where('key', 'last_id')->first();
+
+        return view('home', compact('last_id'));
+    }
     public function index(){
-        $user = User::first();
+        $user = Auth::user();
         return view('user', compact('user'));
     }
     public function store(Request $request){
@@ -22,7 +29,7 @@ class UserController extends Controller
 
     public function update(Request $request, $id){
         $request->validate($this->validator($id));
-        $user = User::first();
+        $user = Auth::user();
         $user->update($request->all());
         return back()->with(['message' => 'Zaktualizowano pomyslnie']);
     }
@@ -35,8 +42,8 @@ class UserController extends Controller
             'city' => 'required',
             'postal' => 'required',
             'phone' => 'required',
-            'opened_from' => (!$id)? 'required|date_format:H:i' : 'required|date_format:H:i:s',
-            'opened_to' => (!$id)? 'required|date_format:H:i|after:opened_from' : 'required|date_format:H:i:s|after:opened_from',
+            'opened_from' => (!$id)? 'required|date_format:H:i' : 'required|date_format:H:i',
+            'opened_to' => (!$id)? 'required|date_format:H:i|after:opened_from' : 'required|date_format:H:i|after:opened_from',
             'inpost' => 'required'
         ];
     }

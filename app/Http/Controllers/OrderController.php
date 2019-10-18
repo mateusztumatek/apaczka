@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Services\ApaczkaApi;
 use App\Services\ApaczkaOrder;
 use App\Services\ApaczkaOrderShippment;
+use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
@@ -18,7 +19,14 @@ class OrderController extends Controller
         $apaczka->setVerboseMode();
 /*        $apaczka->setTestMode();*/
         $apaczka->setProductionMode();
-
+        $request->validate([
+            'start' => ['required','integer',function($field, $data, $fail){
+                $last_order = Order::orderBy('id', 'desc')->take(1)->first();
+                if($last_order){
+                    if($last_order->id < $data) $fail('Nie ma zamowien wiekszych niz podana wartosc');
+                }
+            }]
+        ]);
         /***************************
          *	validateAuthData
          */
@@ -26,16 +34,17 @@ class OrderController extends Controller
         if(!$resp = $apaczka->validateAuthData()){
             die('validateAuthData ERROR'."\n");
         }
-        $last_id = Setting::where('key', 'last_id')->first();
+        /*$last_id = Setting::where('key', 'last_id')->first();
         if($last_id){
-            $orders = Order::with('shipping_relation', 'address')->where('id', '>', $last_id->value)->get();
+            $orders = Order::with('shipping_relation', 'address')->where('status', 2)->where('id', '>', $last_id->value)->get();
         }else{
-            $orders = Order::with('shipping_relation', 'address')->where('id', '>', '11229')->get();
-        }
+            $orders = Order::with('shipping_relation', 'address')->where('status', 2)->where('id', '>', '11229')->get();
+        }*/
+        $orders = Order::with('shipping_relation', 'address')->where('status', 2)->where('id', '>', $request->start)->get();
         if($request->order_id){
             $orders = Order::where('id', $request->order_id)->get();
         }
-        $sender = User::first();
+        $sender = Auth::user();
         if(!$sender) return back()->withErrors('Brak ustawionych danych użytkownika');
         $fails = [];
         foreach ($orders as $o){
@@ -101,5 +110,9 @@ class OrderController extends Controller
             }
         }
         return back()->withErrors('Wysłano zamówienia, nieudanych: '.count($fails).' Więcej informacji w zakładce: błędy');
+    }
+    public function ordersList(Request $request){
+        $orders = Order::with('address', 'shipping_relation')->orderBy('creation_date', 'desc')->paginate(10);
+        return response()->json($orders);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Order;
 use App\Shippment;
 use App\ShippmentMap;
 use Illuminate\Http\Request;
@@ -52,6 +53,7 @@ class ShippmentController extends Controller
                     'apaczka_codename' => $s['code'],
                     'is_domestic' => (array_key_exists('isDomestic', $s) && $s['isDomestic'] == 'on')? true : false,
                     'is_paczkomat' => (array_key_exists('is_paczkomat', $s) && $s['is_paczkomat'] == 'on')? true : false,
+                    'cash_on_delivery' => (array_key_exists('cash_on_delivery', $s) && $s['cash_on_delivery'] == 'on')? true : false,
                     'pickup' => $s['pickup_type'],
                     'order_type' => $key
                 ]);

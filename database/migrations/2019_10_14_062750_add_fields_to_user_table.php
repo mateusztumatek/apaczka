@@ -14,13 +14,13 @@ class AddFieldsToUserTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('street');
-            $table->string('city');
-            $table->string('postal');
-            $table->string('phone');
-            $table->string('api_key', 60);
-            $table->time('opened_from');
-            $table->time('opened_to');
+            $table->string('street')->nullable();
+            $table->string('city')->nullable();
+            $table->string('postal')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('api_key', 60)->nullable();
+            $table->time('opened_from')->nullable();
+            $table->time('opened_to')->nullable();
         });
     }
 
