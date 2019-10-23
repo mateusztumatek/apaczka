@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class ErrorsController extends Controller
 {
     public function index(Request $request){
-        $my_errors = Error::paginate(10);
+        $my_errors = Error::orderBy('created_at', 'desc')->paginate(10);
         return view('errors', compact('my_errors'));
     }
     public function destroy(Request $request, $id){

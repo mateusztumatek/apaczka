@@ -22,10 +22,14 @@ class ApaczkaOrderShippment {
             }
         }
     }
-    function setPaczkomatOptions($sender_paczkomat, $recivier_paczkomat){
+    function setPaczkomatOptions($sender_paczkomat = null, $recivier_paczkomat){
         $this->options = array();
-        $this->options[0] = $sender_paczkomat;
-        $this->options[1] = $recivier_paczkomat;
+        if($sender_paczkomat){
+            $this->options[0] = $sender_paczkomat;
+            $this->options[1] = $recivier_paczkomat;
+        }else{
+            $this->options[0] = $recivier_paczkomat;
+        }
     }
     function getShipmentTypeCode() {
         return $this->shipmentTypeCode;

@@ -5,9 +5,30 @@
                 <span class="sr-only">Loading...</span>
             </div>
         </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <label>Wyszukaj po ID</label>
+                <input type="number" class="form-control" v-model="params.id" @change="getOrders()">
+            </div>
+        </div>
         <h2>Ostatnie zamówienia</h2>
+       <!-- <div>
+            <p>filtruj:</p>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select class="form-control" v-model="params.status" @change="getOrders()">
+                            <option :value="0">Nowe</option>
+                            <option :value="1">W trakcie realizacji</option>
+                            <option :value="2">Zrealizowane</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>-->
         <paginate
-                :page-count="10"
+                :page-count="info.last_page"
                 :click-handler="changePage"
                 :prev-text="'Prev'"
                 :next-text="'Next'"
@@ -28,6 +49,8 @@
                 <th scope="col">Typ wysyłki</th>
                 <th scope="col">Adres wysyłki</th>
                 <th scope="col">Utworzone</th>
+                <th scope="col">Wysłane</th>
+                <th scope="col" class="col-auto">Akcje</th>
             </tr>
             </thead>
             <tbody>
@@ -38,6 +61,8 @@
                     <td>{{order.shipping_relation.name}}</td>
                     <td>{{order.address.city}}</td>
                     <td>{{order.creation_date}}</td>
+                    <td><span v-if="order.order_info && order.order_info.is_send"><div class="alert alert-info p-1">Tak</div></span><span v-else><div class="alert alert-danger p-1">Nie</div></span></td>
+                    <td><a :href="base_url+'/orders?order_id='+order.id" class="btn btn-primary" v-if="order.order_info && order.order_info.is_send">Wyślij ponownie</a> <a :href="base_url+'/orders?order_id='+order.id" class="btn btn-primary" v-else>Wyślij</a></td>
                 </tr>
             </tbody>
         </table>
@@ -52,7 +77,10 @@
         data(){
             return{
                 orders: [],
-                info:{}
+                params:{},
+                info:{
+                    last_page: 1
+                }
             }
         },
         computed:{
@@ -61,8 +89,8 @@
             }
         },
         mounted(){
-            this.getOrders();
             this.info.page = 1;
+            this.getOrders();
         },
         methods:{
             changePage(page){
@@ -70,8 +98,10 @@
               this.getOrders();
             },
             getOrders(){
+                var obj1={page: this.info.page};
+                var obj = {...obj1, ...this.params};
                 this.isLoading = true;
-                axios.get(this.base_url+'/orders_list', {params:{page: this.info.page}}).then(({data}) => {
+                axios.get(this.base_url+'/orders_list', {params:obj}).then(({data}) => {
                     this.orders = data.data;
                     this.info.page = data.current_page;
                     this.info.last_page = data.last_page;

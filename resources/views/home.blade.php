@@ -3,9 +3,6 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-lg-12">
-
-            <last-orders></last-orders>
-
             @if($errors->any())
                 <div class="alert alert-primary">{{$errors->first()}}</div>
             @endif
@@ -21,13 +18,16 @@
                     <input type="number" name="start" class="form-control" value="{{($last_id)? $last_id->value : old('start')}}">
                 </div>
                 <div class="links">
-                    <a  style="cursor: pointer" onclick="sendForm()">Wyślij zamówienie</a>
+                    <a  style="cursor: pointer" onclick="sendForm()">Wyślij zamówienia (Od id wpisanego w polu powyżej)</a>
                     <a  href="{{url('/user')}}">Ustaw swoje dane</a>
                     <a  href="{{url('/set_shippment')}}">Ustaw kody wysyłek</a>
                     <a  href="{{url('/errors')}}">Błędy</a>
 
                 </div>
             </form>
+
+                <last-orders></last-orders>
+
         </div>
     </div>
 </div>

@@ -6,6 +6,7 @@ use App\Order;
 use App\Setting;
 use App\User;
 use Carbon\Carbon;
+use Doctrine\DBAL\Exception\DatabaseObjectExistsException;
 use Illuminate\Http\Request;
 use App\Services\ApaczkaApi;
 use App\Services\ApaczkaOrder;
@@ -19,14 +20,20 @@ class OrderController extends Controller
         $apaczka->setVerboseMode();
 /*        $apaczka->setTestMode();*/
         $apaczka->setProductionMode();
-        $request->validate([
-            'start' => ['required','integer',function($field, $data, $fail){
-                $last_order = Order::orderBy('id', 'desc')->take(1)->first();
-                if($last_order){
-                    if($last_order->id < $data) $fail('Nie ma zamowien wiekszych niz podana wartosc');
-                }
-            }]
-        ]);
+        if($request->method() == 'POST'){
+            $request->validate([
+                'start' => ['required','integer',function($field, $data, $fail){
+                    $last_order = Order::orderBy('id', 'desc')->take(1)->first();
+                    if($last_order){
+                        if($last_order->id < $data) $fail('Nie ma zamowien wiekszych niz podana wartosc');
+                    }
+                }]
+            ]);
+        }else{
+            $request->validate([
+                'order_id' => 'required'
+            ]);
+        }
         /***************************
          *	validateAuthData
          */
@@ -40,7 +47,14 @@ class OrderController extends Controller
         }else{
             $orders = Order::with('shipping_relation', 'address')->where('status', 2)->where('id', '>', '11229')->get();
         }*/
-        $orders = Order::with('shipping_relation', 'address')->where('status', 2)->where('id', '>', $request->start)->get();
+        if($request->start){
+            $orders = Order::with('shipping_relation', 'address', 'orderInfo')->where('status', 2)->where('id', '>', $request->start)->get();
+            foreach ($orders as $key => $o){
+                if($o->order_info && $o->order_info->is_send){
+                    $orders->forget($key);
+                }
+            }
+        }
         if($request->order_id){
             $orders = Order::where('id', $request->order_id)->get();
         }
@@ -69,26 +83,37 @@ class OrderController extends Controller
                 $order->setSenderAddress($sender->name, $sender->name, $sender->street, '.', $sender->city, '0', $sender->postal, '', $sender->email, $sender->phone);
 
 //$order->setPobranie('11444400000000300000418888','100');
-
                 $order_shipment = new ApaczkaOrderShippment('PACZ', 40, 30, 5, 5);
                 if($o->shipping_relation->shippment_maps->is_paczkomat){
-                    $temp = explode(' ', $o->notes);
+                    $temp = substr($o->notes, strpos($o->notes, '...INPOST:'), strlen($o->notes));
+                    $temp = explode(' ', $temp);
                     if(array_key_exists(1, $temp)){
                         /*$order_shipment->setPaczkomatOptions($temp[1]);*/
-                        $order_shipment->setPaczkomatOptions($sender->inpost, $temp[1]);
+                        if($o->shipping_relation->shippment_maps->pickup == 'COURIER'){
+                            $order_shipment->setPaczkomatOptions(null, $temp[1]);
+                        }else{
+                            $order_shipment->setPaczkomatOptions($sender->inpost, $temp[1]);
+                        }
                     }
-/*                    dd($order_shipment);*/
                 }
+
+
+
 // wartosc przesylki do ubezpieczenia
 // $order_shipment->setShipmentValue('123');
-
                 $order->addShipment($order_shipment);
-/*                dd($order);*/
 // Zamowienie kuriera
                 $resp = $apaczka->placeOrder($order);
 
                 if($resp !== false && $resp->return->order){
+
                     $orderId = $resp->return->order->id;
+                    if(!$o->orderInfo){
+                        $o->orderInfo()->create([
+                            'order_id' => $o->id,
+                            'is_send' => true
+                        ]);
+                    }
                 }else{
 //	print_r($order);
                     array_push($fails, $o);
@@ -112,7 +137,7 @@ class OrderController extends Controller
         return back()->withErrors('Wysłano zamówienia, nieudanych: '.count($fails).' Więcej informacji w zakładce: błędy');
     }
     public function ordersList(Request $request){
-        $orders = Order::with('address', 'shipping_relation')->orderBy('creation_date', 'desc')->paginate(10);
+        $orders = Order::with('address', 'shipping_relation', 'orderInfo')->orderBy('creation_date', 'desc')->where('status', 2)->filter()->paginate(50);
         return response()->json($orders);
     }
 }

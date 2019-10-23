@@ -126,5 +126,5 @@
     <script>
         var base_url = '{{url('/')}}';
     </script>
-    <script src="{{asset('/js/app.js')}}" defer></script>
+    <script src="{{asset('/js/app.js?hash=2222')}}" defer></script>
 </html>
